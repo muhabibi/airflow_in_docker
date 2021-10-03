@@ -225,7 +225,12 @@ http://localhost:5884
 
 ![Airflow](https://github.com/muhabibi/glints/blob/master/assets/airflow.png?raw=true)
 ### Create Connection
-To create connection, visit Airflow GUI. Go to Admins -> Connections. In this case we will create 2 Postgres connection.
+To create connection, visit Airflow GUI. Go to Admins -> Connections. 
+For section Host, we can run this script in order to know our host IP
+```
+ifconfig | grep inet
+```
+In this case we will create 2 Postgres connection.
 ![Postgres X connection](https://github.com/muhabibi/glints/blob/master/assets/pgx.png?raw=true)
 ![Postgres Y connection](https://github.com/muhabibi/glints/blob/master/assets/pgy.png?raw=true)
 
@@ -304,3 +309,5 @@ Table tb_trx_dest before ingestion:
 
 Table tb_trx_dest after ingestion:
 ![pg_y_tablefilled](https://github.com/muhabibi/glints/blob/master/assets/pg_y_tablefilled.png?raw=true)
+
+In the last image, we can conclude that we successfully transfer data from Postgres X to Postgres Y using manually trigger Airflow DAG
