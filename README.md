@@ -110,7 +110,7 @@ docker ps
 # Setup & Configuration
 ## Postgres 
 In docker-compose.yml file above, we pull images that we need from Docker hub image repository. In this section, we'll start by creating postgres containers (pg_x & pg_y)
-```
+```yml
 pg_x:
     image: postgres:latest
     container_name: pg_x
@@ -144,7 +144,7 @@ pg_x:
 ```
 
 Above we have create Postgres container, by pulling from postgres image from docker hub image repository. This database will use default port 5432 which exposed to host port 5432. To access this database, we can use our defined credential (user, password & db = 'airflow'). To make it easier for file sharing, we use 'volume' to mount our container volume to host volume. In this case we will initiate data to this database using init-data.sql :
-```
+```sql
 CREATE TABLE tb_trx_src
 (
     id SERIAL NOT NULL,
@@ -171,7 +171,7 @@ By the time we run our docker-compose file, after postgres image has been create
 We create 2 different databases using different containers, as intented as source (using port 5432) & target/ destination database (using port 5433).
 
 Besides port, we also run another init-data sql file (init-data-pg2.sql). But this file only executes DDL, there's no data insertion to destination database. This is init-data-pg2.sql :
-```
+```sql
 CREATE TABLE tb_trx_dest
 (
     id SERIAL NOT NULL,
@@ -182,7 +182,7 @@ CREATE TABLE tb_trx_dest
 
 ## Airflow
 We pull airflow image from [puckel/docker-airflow](https://hub.docker.com/r/puckel/docker-airflow/). This container will be created after 2 other containers (pg_x & pg_y) has been created beforehand (defined in 'depends_on', it's used to order container creation). For airflow we use port 5884.
-```
+```yml
 webserver:
     image: puckel/docker-airflow 
     container_name: airflow
@@ -205,16 +205,16 @@ webserver:
 
 ### Creating Fernet Key
 For encrypted connection passwords, we must have the same fernet_key. By default docker-airflow generates the fernet_key at startup, you have to set an environment variable in the docker-compose file to set the same key accross containers. To generate a fernet_key :
-```
+```sh
 python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 ```
 Then adding the line with the new generated key (including the final "=" to) to my **~/.bash_profile** file in this way: 
-```
+```sh
 export FERNET_KEY="new_generated_key"
 ``` 
 
 Also in docker-compose file we add parameter
-```
+```yml
 environment:
     - FERNET_KEY=${FERNET_KEY}
 ```    
@@ -224,10 +224,12 @@ http://localhost:5884
 ```
 
 ![Airflow](https://github.com/muhabibi/glints/blob/master/assets/airflow.png?raw=true)
+
+
 ### Create Connection
 To create connection, visit Airflow GUI. Go to Admins -> Connections. 
 For section Host, we can run this script in order to know our host IP
-```
+```sh
 ifconfig | grep inet
 ```
 In this case we will create 2 Postgres connection.
@@ -236,7 +238,7 @@ In this case we will create 2 Postgres connection.
 
 ## Pgadmin
 For accessing data in our Postgres, we used Pgadmin4 configured already in the docker-compose file. 
-```
+```yml
   pgadmin-compose:
     image: dpage/pgadmin4
     container_name: pgadmin
