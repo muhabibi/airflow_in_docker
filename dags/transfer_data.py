@@ -24,12 +24,10 @@ def _transfer_data():
     
     
 with DAG(**dag_params) as dag:
-    
     t1 = DummyOperator(task_id='start', dag=dag)
 
     t2 = PythonOperator(
         task_id='transfer_data',
-        # provide_context=True,
         python_callable=_transfer_data,
         dag=dag)
     
