@@ -24,7 +24,7 @@ To solve problem set above, we can use docker compose that can cover creating mu
 * Postgres, as source database
 * Another Postgres, as destination database
 * Airflow, contains airflow webserver & scheduler
-* pgadmin, as Postgres GUI toolsnod
+* pgadmin, as Postgres GUI tools
 
 Now let's take a look at docker-compose.yml file
 ```yml
@@ -97,11 +97,11 @@ services:
       unless-stopped    
 ```
 
-Run the following script :
+Run the following script:
 ```
 docker-compose -f docker-compose.yml up -d
 ```
-And we can check the container that's being started using command :
+And we can check the container that's being started using command:
 ```
 docker ps 
 ```
@@ -170,7 +170,7 @@ By the time we run our docker-compose file, after postgres image has been create
 ### Postgres 5432 & 5433
 We create 2 different databases using different containers, as intented as source (using port 5432) & target/ destination database (using port 5433).
 
-Besides port, we also run another init-data sql file (init-data-pg2.sql). But this file only executes DDL, there's no data insertion to destination database. This is init-data-pg2.sql :
+Besides port, we also run another init-data sql file (init-data-pg2.sql). But this file only executes DDL, there's no data insertion to destination database. This is init-data-pg2.sql:
 ```sql
 CREATE TABLE tb_trx_dest
 (
@@ -204,7 +204,7 @@ webserver:
 ```
 
 ### Creating Fernet Key
-For encrypted connection passwords, we must have the same fernet_key. By default docker-airflow generates the fernet_key at startup, you have to set an environment variable in the docker-compose file to set the same key accross containers. To generate a fernet_key :
+For encrypted connection passwords, we must have the same fernet_key. By default docker-airflow generates the fernet_key at startup, you have to set an environment variable in the docker-compose file to set the same key accross containers. To generate a fernet_key:
 ```sh
 python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 ```
@@ -228,7 +228,7 @@ http://localhost:5884
 
 ### Create Connection
 To create connection, visit Airflow GUI. Go to Admins -> Connections. 
-For section Host, we can run this script in order to know our host IP
+For section Host, we can run this script in order to know our host IP.
 ```sh
 ifconfig | grep inet
 ```
@@ -253,7 +253,7 @@ For accessing data in our Postgres, we used Pgadmin4 configured already in the d
     restart: 
       unless-stopped    
 ```
-Pgadmin is accessible via URL :
+Pgadmin is accessible via URL:
 ```
 http://localhost:16543
 ```
@@ -268,7 +268,7 @@ To add connection, click Add New Server then fill in the connection string.
 ![Pgx Pgadmin](https://github.com/muhabibi/glints/blob/master/assets/pgx_pgadmin.png?raw=true)
 ![Pgy Pgadmin](https://github.com/muhabibi/glints/blob/master/assets/pgy_pgadmin.png?raw=true)
 # Data Transfer 
-To transfer data from Postgres X to Postgres Y, we can build a DAG inside transfer_data.py under folder /dags :
+To transfer data from Postgres X to Postgres Y, we can build a DAG inside transfer_data.py under folder /dags:
 ```py
 from datetime import datetime, timedelta
 from airflow import DAG
@@ -312,4 +312,4 @@ Table tb_trx_dest before ingestion:
 Table tb_trx_dest after ingestion:
 ![pg_y_tablefilled](https://github.com/muhabibi/glints/blob/master/assets/pg_y_tablefilled.png?raw=true)
 
-In the last image, we can conclude that we successfully transfer data from Postgres X to Postgres Y using manually trigger Airflow DAG
+In the last image, we can conclude that we successfully transfer data from Postgres X to Postgres Y using manually trigger Airflow DAG.
