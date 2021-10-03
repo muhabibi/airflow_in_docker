@@ -1,0 +1,69 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+  pg_x:
+    image: postgres:latest
+    container_name: pg_x
+    restart: always
+    environment:
+      - DATABASE_HOST=127.0.0.1
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports: 
+      - "5432:5432"
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    volumes:
+      - ./init-data.sql:/docker-entrypoint-initdb.d/init-data.sql
+
+  pg_y:
+    image: postgres:latest
+    container_name: pg_y
+    restart: always
+    environment:
+      - DATABASE_HOST=127.0.0.1
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./init-data-pg2.sql:/docker-entrypoint-initdb.d/init-data-pg2.sql
+
+  webserver:
+    image: puckel/docker-airflow 
+    container_name: airflow
+    restart: always
+    depends_on:
+      - pg_x
+      - pg_y
+    environment:
+      - .env
+      - FERNET_KEY=${FERNET_KEY}
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+    ports:
+      - "5884:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment: 
+      PGADMIN_DEFAULT_EMAIL: "airflow@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "airflow"
+    ports: 
+      - "16543:80"
+    depends_on: 
+      - pg_x
+      - pg_y
+    restart: 
+      unless-stopped    
